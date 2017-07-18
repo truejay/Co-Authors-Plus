@@ -35,8 +35,6 @@ function get_coauthors( $post_id = 0 ) {
 			}
 		} // the empty else case is because if we force guest authors, we don't ever care what value wp_posts.post_author has.
 	}
-	// remove duplicate $coauthors objects from mapping user accounts to guest authors accounts
-	$coauthors = array_unique( $coauthors, SORT_REGULAR );
 	return $coauthors;
 }
 
@@ -144,7 +142,7 @@ class CoAuthorsIterator {
 }
 
 //Helper function for the following new template tags
-function coauthors__echo( $tag, $type = 'tag', $separators = array(), $tag_args = null, $echo = true ) {
+function coauthors__echo( $tag, $type = 'tag', $separators = array(), $tag_args = null, $echo = true, $post_id = 0 ) {
 
 	// Define the standard output separator. Constant support is for backwards compat.
 	// @see https://github.com/danielbachhuber/Co-Authors-Plus/issues/12
@@ -168,7 +166,7 @@ function coauthors__echo( $tag, $type = 'tag', $separators = array(), $tag_args 
 
 	$output = '';
 
-	$i = new CoAuthorsIterator();
+	$i = new CoAuthorsIterator($post_id);
 	$output .= $separators['before'];
 	$i->iterate();
 	do {
@@ -216,13 +214,13 @@ function coauthors__echo( $tag, $type = 'tag', $separators = array(), $tag_args 
  * @param string $after What should appear after the presentation of co-authors
  * @param bool $echo Whether the co-authors should be echoed or returned. Defaults to true.
  */
-function coauthors( $between = null, $betweenLast = null, $before = null, $after = null, $echo = true ) {
+function coauthors( $between = null, $betweenLast = null, $before = null, $after = null, $echo = true, $post_id = 0 ) {
 	return coauthors__echo('display_name', 'field', array(
 		'between' => $between,
 		'betweenLast' => $betweenLast,
 		'before' => $before,
 		'after' => $after,
-	), null, $echo );
+	), null, $echo, $post_id );
 }
 
 /**
@@ -235,13 +233,13 @@ function coauthors( $between = null, $betweenLast = null, $before = null, $after
  * @param string $after What should appear after the presentation of co-authors
  * @param bool $echo Whether the co-authors should be echoed or returned. Defaults to true.
  */
-function coauthors_posts_links( $between = null, $betweenLast = null, $before = null, $after = null, $echo = true ) {
+function coauthors_posts_links( $between = null, $betweenLast = null, $before = null, $after = null, $echo = true, $post_id = 0 ) {
 	return coauthors__echo('coauthors_posts_links_single', 'callback', array(
 		'between' => $between,
 		'betweenLast' => $betweenLast,
 		'before' => $before,
 		'after' => $after,
-	), null, $echo );
+	), null, $echo, $post_id );
 }
 
 /**
@@ -290,13 +288,13 @@ function coauthors_posts_links_single( $author ) {
  * @param string $after What should appear after the presentation of co-authors
  * @param bool $echo Whether the co-authors should be echoed or returned. Defaults to true.
  */
-function coauthors_firstnames( $between = null, $betweenLast = null, $before = null, $after = null, $echo = true ) {
+function coauthors_firstnames( $between = null, $betweenLast = null, $before = null, $after = null, $echo = true, $post_id = 0 ) {
 	return coauthors__echo('get_the_author_meta', 'tag', array(
 		'between' => $between,
 		'betweenLast' => $betweenLast,
 		'before' => $before,
 		'after' => $after,
-	), 'first_name', $echo );
+	), 'first_name', $echo, $post_id );
 }
 
 /**
@@ -308,13 +306,13 @@ function coauthors_firstnames( $between = null, $betweenLast = null, $before = n
  * @param string $after What should appear after the presentation of co-authors
  * @param bool $echo Whether the co-authors should be echoed or returned. Defaults to true.
  */
-function coauthors_lastnames( $between = null, $betweenLast = null, $before = null, $after = null, $echo = true ) {
+function coauthors_lastnames( $between = null, $betweenLast = null, $before = null, $after = null, $echo = true, $post_id = 0 ) {
 	return coauthors__echo( 'get_the_author_meta', 'tag', array(
 		'between' => $between,
 		'betweenLast' => $betweenLast,
 		'before' => $before,
 		'after' => $after,
-	), 'last_name', $echo );
+	), 'last_name', $echo, $post_id );
 }
 
 /**
@@ -326,13 +324,13 @@ function coauthors_lastnames( $between = null, $betweenLast = null, $before = nu
  * @param string $after What should appear after the presentation of co-authors
  * @param bool $echo Whether the co-authors should be echoed or returned. Defaults to true.
  */
-function coauthors_nicknames( $between = null, $betweenLast = null, $before = null, $after = null, $echo = true ) {
+function coauthors_nicknames( $between = null, $betweenLast = null, $before = null, $after = null, $echo = true, $post_id = 0 ) {
 	return coauthors__echo( 'get_the_author_meta', 'tag', array(
 		'between' => $between,
 		'betweenLast' => $betweenLast,
 		'before' => $before,
 		'after' => $after,
-	), 'nickname', $echo );
+	), 'nickname', $echo, $post_id );
 }
 
 /**
@@ -344,13 +342,13 @@ function coauthors_nicknames( $between = null, $betweenLast = null, $before = nu
  * @param string $after What should appear after the presentation of co-authors
  * @param bool $echo Whether the co-authors should be echoed or returned. Defaults to true.
  */
-function coauthors_links( $between = null, $betweenLast = null, $before = null, $after = null, $echo = true ) {
+function coauthors_links( $between = null, $betweenLast = null, $before = null, $after = null, $echo = true, $post_id = 0 ) {
 	return coauthors__echo( 'coauthors_links_single', 'callback', array(
 		'between' => $between,
 		'betweenLast' => $betweenLast,
 		'before' => $before,
 		'after' => $after,
-	), null, $echo );
+	), null, $echo, $post_id );
 }
 
 /**
@@ -362,13 +360,13 @@ function coauthors_links( $between = null, $betweenLast = null, $before = null, 
  * @param string $after What should appear after the presentation of email addresses
  * @param bool $echo Whether the co-authors should be echoed or returned. Defaults to true.
  */
-function coauthors_emails( $between = null, $betweenLast = null, $before = null, $after = null, $echo = true ) {
+function coauthors_emails( $between = null, $betweenLast = null, $before = null, $after = null, $echo = true, $post_id = 0 ) {
 	return coauthors__echo( 'get_the_author_meta', 'tag', array(
 		'between' => $between,
 		'betweenLast' => $betweenLast,
 		'before' => $before,
 		'after' => $after,
-	), 'user_email', $echo );
+	), 'user_email', $echo, $post_id );
 }
 
 /**
@@ -398,13 +396,13 @@ function coauthors_links_single( $author ) {
  * @param string $after What should appear after the presentation of co-authors
  * @param bool $echo Whether the co-authors should be echoed or returned. Defaults to true.
  */
-function coauthors_ids( $between = null, $betweenLast = null, $before = null, $after = null, $echo = true ) {
+function coauthors_ids( $between = null, $betweenLast = null, $before = null, $after = null, $echo = true, $post_id = 0 ) {
 	return coauthors__echo( 'ID', 'field', array(
 		'between' => $between,
 		'betweenLast' => $betweenLast,
 		'before' => $before,
 		'after' => $after,
-	), null, $echo );
+	), null, $echo, $post_id );
 }
 
 function get_the_coauthor_meta( $field ) {
